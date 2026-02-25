@@ -9,7 +9,7 @@ const PostPage = () => {
       {/* Profile Header */}
       <div className="d-flex align-items-center mb-4 user-header">
         <img
-          src="https://via.placeholder.com/80"
+          src="https://thumbs.dreamstime.com/b/city-park-pond-shore-alley-20238927.jpg"
           alt="User"
           className="user-img me-3"
         />
@@ -83,7 +83,7 @@ const PostPage = () => {
           <div key={i} className="col-md-6 mb-4">
             <div className="card post-card shadow-sm">
               <img
-                src="https://via.placeholder.com/150"
+                src="https://thumbs.dreamstime.com/b/city-park-pond-shore-alley-20238927.jpg"
                 alt="Post"
                 className="card-img-top"
                 style={{

@@ -10,6 +10,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Main from "./components/Main";
 import PostPage from "./components/PostPage";
+import Admin from "./components/Admin";
 
 function App() {
 
@@ -30,6 +31,7 @@ function App() {
       <Signup />
       <Main/>
       <PostPage/>
+      <Admin/>
     </>
   );
 }

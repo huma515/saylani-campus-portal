@@ -8,6 +8,7 @@ import Login from "./components/Login";
 // ✅ React Toastify import
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Main from "./components/Main";
 
 function App() {
 
@@ -26,7 +27,7 @@ function App() {
       {/* Components */}
       <Login />
       <Signup />
-      
+      <Main/>
     </>
   );
 }

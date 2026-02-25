@@ -72,3 +72,68 @@
 .text-muted {
   color: #555;
 }
+
+/* main page */
+/* Container background */
+.main-ui-container {
+  background-color: #ffffff;
+}
+
+/* Header */
+.main-ui-header {
+  color: #0057a8;
+  font-weight: bold;
+  font-size: 2rem;
+}
+
+/* Create Post Button */
+.create-post-btn {
+  background-color: #66b032 !important;
+  color: #ffffff!important ;
+  border: none;
+  transition: all 0.3s ease;
+}
+.create-post-btn:hover {
+  background-color: #5aa12b !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Filter Buttons */
+.filter-btns .filter-btn {
+  background-color: #ffffff;
+  color: #0057a8;
+  border: 1px solid #0057a8;
+  margin-right: 0.5rem;
+  transition: all 0.3s ease;
+}
+.filter-btns .filter-btn:hover {
+  background-color: #0057a8;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Post Cards */
+.post-card {
+  border-radius: 10px;
+  border: 1px solid #66b032;
+  transition: all 0.3s ease;
+}
+.post-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+/* Post Title */
+.post-title {
+  color: #0057a8;
+  font-weight: 600;
+}
+
+/* Status Badge */
+.post-status {
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+}

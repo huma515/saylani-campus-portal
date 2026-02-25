@@ -137,3 +137,95 @@
   padding: 0.5rem 0.75rem;
   font-size: 0.85rem;
 }
+
+/* post page */
+/* Profile Page Container */
+.profile-page {
+  background-color: #ffffff;
+}
+
+/* User Header */
+.user-header {
+  align-items: center;
+}
+.user-img {
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border: 2px solid #66b032;
+}
+.user-name {
+  margin: 0;
+  font-weight: bold;
+  color: #0057a8;
+}
+
+/* Form Card */
+.post-form-card {
+  border-radius: 10px;
+  border: 1px solid #66b032;
+  transition: all 0.3s ease;
+}
+.post-form-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+/* Buttons */
+.submit-btn {
+  background-color: #66b032 !important;
+  color: #ffffff;
+  border: none;
+  transition: all 0.3s ease;
+}
+.submit-btn:hover {
+  background-color: #5aa12b !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Post Cards */
+.post-card {
+  border-radius: 10px;
+  border: 1px solid #66b032;
+  transition: all 0.3s ease;
+}
+.post-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+/* Post Titles */
+.post-title {
+  color: #0057a8;
+  font-weight: 600;
+}
+
+/* Edit/Delete Buttons */
+.edit-btn {
+  background-color: #0057a8 !important;
+  color: #fff !important;
+  border: none;
+  transition: all 0.3s ease;
+}
+.edit-btn:hover {
+  background-color: #004a90;
+}
+.delete-btn {
+  background-color: #ff4d4d !important;
+  color: #fff !important;
+  border: none;
+  transition: all 0.3s ease;
+}
+.delete-btn:hover {
+  background-color: #e60000;
+}
+
+/* Input focus */
+.form-control:focus,
+.form-select:focus {
+  border-color: #66b032;
+  box-shadow: 0 0 5px rgba(102, 176, 50, 0.5);
+  outline: none;
+}

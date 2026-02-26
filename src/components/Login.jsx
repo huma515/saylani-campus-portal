@@ -3,6 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../App.css";
 import supabase from "../config/supabse";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 const Login = () => {
 
@@ -36,6 +37,14 @@ const Login = () => {
         email: loginval.email,
         password: loginval.password,
       });
+
+      const userId = data.user.id
+
+      const { data : profile, error :profilError} = await supabase
+  .from('profile')
+  .select("role")
+  .eq("userid",userId)
+  .single()
 
       if (error) {
         toast.error(error.message);
@@ -111,7 +120,7 @@ const Login = () => {
 
           <div className="text-center">
             <span className="text-muted">Don’t have an account? </span>
-            <a href="#" className="signup-link">Sign Up</a>
+            <Link to="/signup" className="signup-link" >Sign Up</Link>
           </div>
 
         </form>

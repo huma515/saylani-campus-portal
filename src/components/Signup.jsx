@@ -3,10 +3,11 @@ import supabase from "../config/supabse";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../App.css";
 import { toast } from "react-toastify";
+import { Link, useNavigate } from "react-router-dom";
 
 const Signup = () => {
 
-  const [value, setvalue] = useState({
+  const [value, setValue] = useState({
     fullName: "",
     email: "",
     password: "",
@@ -14,9 +15,10 @@ const Signup = () => {
   });
 
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setvalue({
+    setValue({
       ...value,
       [e.target.name]: e.target.value,
     });
@@ -46,26 +48,52 @@ const Signup = () => {
     try {
       setLoading(true);
 
-      const { data, error } = await supabase.auth.signUp({
+      // 🔹 Signup user in Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: value.email,
         password: value.password,
       });
 
-      if (error) {
-        toast.error(error.message);
-      } else {
-        toast.success("Signup successful! Check your email ✅");
-
-        // form reset
-        setvalue({
-          fullName: "",
-          email: "",
-          password: "",
-          conpass: "",
-        });
-
-        console.log(data);
+      if (authError) {
+        toast.error(authError.message);
+        return;
       }
+
+      const userId = authData.user.id;
+
+      // 🔹 Insert into profile table
+      const { data: profileData, error: profileError } = await supabase
+        .from("profile")
+        .insert([
+          {
+            userid: userId,
+            username: value.fullName,
+            email: value.email,  // 🔹 Add email here
+            role: "user",         // default role
+          },
+        ])
+        .select()
+        .single();
+
+      if (profileError) {
+        toast.error(profileError.message);
+        return;
+      }
+
+      toast.success("Signup successful ✅");
+
+      // form reset
+      setValue({
+        fullName: "",
+        email: "",
+        password: "",
+        conpass: "",
+      });
+
+      console.log("Profile created:", profileData);
+
+      // Navigate to login page
+      navigate("/");
 
     } catch (err) {
       toast.error("Something went wrong");
@@ -140,7 +168,7 @@ const Signup = () => {
 
           <div className="text-center">
             <span className="text-muted">Already have an account? </span>
-            <a href="#" className="signup-link">Login</a>
+            <Link to="/" className="signup-link">Login</Link>
           </div>
 
         </form>

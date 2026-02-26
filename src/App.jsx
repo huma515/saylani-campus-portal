@@ -1,16 +1,11 @@
-import { useState } from "react";
+
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-
-import Signup from "./components/Signup";
-import Login from "./components/Login";
-
 // ✅ React Toastify import
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Main from "./components/Main";
-import PostPage from "./components/PostPage";
-import Admin from "./components/Admin";
+import RouterApp from "./routing/RouterApp";
+
 
 function App() {
 
@@ -26,12 +21,8 @@ function App() {
         theme="colored"
       />
 
-      {/* Components */}
-      <Login />
-      <Signup />
-      <Main/>
-      <PostPage/>
-      <Admin/>
+      
+      <RouterApp/>
     </>
   );
 }

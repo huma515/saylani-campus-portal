@@ -1,6 +1,7 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../App.css";
+import { Link } from "react-router-dom";
 
 const Main = () => {
   return (
@@ -9,10 +10,10 @@ const Main = () => {
       {/* Header & Create Post Button */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="main-ui-header">TraceZone</h2>
-        <button className="btn create-post-btn">Create Post</button>
+       <Link to= "/profile"><button className="btn create-post-btn">Create Post</button></Link>
       </div>
 
-      {/* Filter Buttons */}
+      {/* Filter Buttons */}         
       <div className="mb-4 filter-btns">
         {["All", "Lost", "Found", "Complaint"].map((cat) => (
           <button key={cat} className="btn filter-btn">{cat}</button>

@@ -3,9 +3,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../App.css";
 import supabase from "../config/supabse";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
+import { Link ,useNavigate} from "react-router-dom";
 
 const Login = () => {
+  const navigate = useNavigate()
 
   const [loginval, setLoginval] = useState({
     email: "",
@@ -45,7 +46,13 @@ const Login = () => {
   .select("role")
   .eq("userid",userId)
   .single()
-
+   
+if(profile?.role ==="admin"){
+  navigate ("/dashboard")
+}
+else {
+  navigate ("/home")
+}
       if (error) {
         toast.error(error.message);
       } else {

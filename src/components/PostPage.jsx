@@ -1,79 +1,133 @@
-import React from "react";
+import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../App.css";
 
-
 const PostPage = () => {
+  const [category, setCategory] = useState(""); // Lost, Found, Complaint
+
+  const handleCategoryChange = (e) => {
+    setCategory(e.target.value);
+  };
+
   return (
     <div className="container my-5 profile-page">
       {/* Profile Header */}
-      <div className="d-flex align-items-center mb-4 user-header">
+      <div className="d-flex align-items-center mb-5 p-3 user-header shadow-sm rounded">
         <img
           src="https://thumbs.dreamstime.com/b/city-park-pond-shore-alley-20238927.jpg"
           alt="User"
           className="user-img me-3"
         />
         <div>
-          <h4 className="user-name">Ayesha Khan</h4>
-          <p className="user-location text-muted">Karachi</p>
+          <h4 className="user-name mb-1">Ayesha Khan</h4>
+          <p className="user-location text-muted mb-0">Karachi, Pakistan</p>
         </div>
       </div>
 
-      {/* New Post Form */}
+      {/* Post Form Card */}
       <div className="card post-form-card p-4 mb-5 shadow-sm">
-        <h5 style={{ color: "#0057a8" }}>Create New Post</h5>
+        <h5 className="mb-4 fw-bold">Create New Post</h5>
+
         <form>
-          <div className="mb-3">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Post Title"
-            />
-          </div>
-
-          <div className="mb-3">
-            <textarea
-              className="form-control"
-              placeholder="Description"
-              rows="3"
-            ></textarea>
-          </div>
-
-          <div className="mb-3">
-            <select className="form-select">
+          {/* Category Dropdown */}
+          <div className="mb-4">
+            <select
+              className="form-select form-select-lg"
+              value={category}
+              onChange={handleCategoryChange}
+            >
               <option value="">Select Category</option>
-              <option value="Lost">Lost</option>
-              <option value="Found">Found</option>
+              <option value="Lost">Lost Item</option>
+              <option value="Found">Found Item</option>
               <option value="Complaint">Complaint</option>
             </select>
           </div>
 
-          <div className="mb-3">
-            <select className="form-select">
-              <option value="">Select Status</option>
-              <option value="Pending">Pending</option>
-              <option value="Found">Found</option>
-              <option value="Claimed">Claimed</option>
-              <option value="In Review">In Review</option>
-            </select>
-          </div>
+          {/* Dynamic Fields */}
+          {category && (
+            <>
+              {/* Lost / Found Item Form */}
+              {(category === "Lost" || category === "Found") && (
+                <>
+                  <div className="mb-3">
+                    <input
+                      type="text"
+                      className="form-control form-control-lg"
+                      placeholder="Item Title"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <textarea
+                      className="form-control form-control-lg"
+                      placeholder="Description"
+                      rows="3"
+                    ></textarea>
+                  </div>
+                  <div className="row mb-3">
+                    <div className="col-md-6 mb-3 mb-md-0">
+                      <select className="form-select form-select-lg">
+                        <option value="">Select Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Found">Found</option>
+                        <option value="Claimed">Claimed</option>
+                        <option value="In Review">In Review</option>
+                      </select>
+                    </div>
+                    <div className="col-md-6">
+                      <input
+                        type="text"
+                        className="form-control form-control-lg"
+                        placeholder="Location"
+                      />
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <label className="form-label fw-semibold">Attach Image</label>
+                    <input type="file" className="form-control form-control-lg" />
+                  </div>
+                </>
+              )}
 
-          <div className="mb-3">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Location"
-            />
-          </div>
+              {/* Complaint Form */}
+              {category === "Complaint" && (
+                <>
+                  <div className="mb-3">
+                    <input
+                      type="text"
+                      className="form-control form-control-lg"
+                      placeholder="Complaint Title"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <textarea
+                      className="form-control form-control-lg"
+                      placeholder="Describe your issue"
+                      rows="4"
+                    ></textarea>
+                  </div>
+                  <div className="mb-3">
+                    <select className="form-select form-select-lg">
+                      <option value="">Select Severity</option>
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="High">High</option>
+                    </select>
+                  </div>
+                  <div className="mb-4">
+                    <label className="form-label fw-semibold">Attach Image</label>
+                    <input type="file" className="form-control form-control-lg" />
+                  </div>
+                </>
+              )}
+            </>
+          )}
 
-          <div className="mb-3">
-            <label className="form-label">Attach Image</label>
-            <input type="file" className="form-control" />
-          </div>
-
-          <button type="submit" className="btn submit-btn">
-            Post
-          </button>
+          {/* Submit Button */}
+          {category && (
+            <button type="submit" className="btn submit-btn w-100 fw-bold">
+              Submit
+            </button>
+          )}
         </form>
       </div>
 

@@ -8,7 +8,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 const PostPage = () => {
   const navigate = useNavigate();
-  const [category, setCategory] = useState(""); // Lost / Found / Complaint
+
+  const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("");
@@ -16,9 +17,9 @@ const PostPage = () => {
   const [severity, setSeverity] = useState("");
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
-
   const [user, setUser] = useState(null);
 
+  // get logged in user
   useEffect(() => {
     const fetchUser = async () => {
       const { data } = await supabase.auth.getUser();
@@ -32,33 +33,35 @@ const PostPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!user) return toast.error("You must be logged in!");
-    if (!category || !title || !description) {
+    if (!category || !title || !description)
       return toast.error("Please fill all required fields!");
-    }
 
     setLoading(true);
-    let imageUrls = [];
+    let imagePath = null;
 
     try {
-      // Upload images
-      for (let img of images) {
+      // ✅ upload image to storage
+      if (images.length > 0) {
+        const img = images[0];
         const fileName = `${Date.now()}_${img.name}`;
+
         const { error: uploadError } = await supabase.storage
           .from("posts-images")
           .upload(fileName, img);
 
         if (uploadError) throw uploadError;
 
-        // Correctly get public URL
-        const { data: urlData } = supabase.storage
+        // get public url
+        const { data } = supabase.storage
           .from("posts-images")
           .getPublicUrl(fileName);
 
-        imageUrls.push(urlData.publicUrl);
+        imagePath = data.publicUrl;
       }
 
-      // Insert post into mypost table
+      // ✅ insert post (IMPORTANT FIX → array save)
       const { error: insertError } = await supabase.from("mypost").insert([
         {
           user_id: user.id,
@@ -69,7 +72,10 @@ const PostPage = () => {
           status: category !== "Complaint" ? status || null : null,
           location: category !== "Complaint" ? location || null : null,
           severity: category === "Complaint" ? severity || null : null,
-          images: imageUrls.length > 0 ? imageUrls : null,
+
+          // ⭐ FIXED — array format for text[]
+          images: imagePath ? [imagePath] : null,
+
           created_at: new Date(),
         },
       ]);
@@ -89,11 +95,11 @@ const PostPage = () => {
   return (
     <div className="container my-5 profile-page">
       <ToastContainer position="top-right" autoClose={3000} />
+
       <div className="card post-form-card p-4 mb-5 shadow-sm">
         <h5 className="mb-4 fw-bold">Create New Post</h5>
 
         <form onSubmit={handleSubmit}>
-          {/* Category Dropdown */}
           <div className="mb-4">
             <select
               className="form-select form-select-lg"
@@ -107,7 +113,6 @@ const PostPage = () => {
             </select>
           </div>
 
-          {/* Dynamic Fields */}
           {category && (
             <>
               {(category === "Lost" || category === "Found") && (
@@ -121,6 +126,7 @@ const PostPage = () => {
                       onChange={(e) => setTitle(e.target.value)}
                     />
                   </div>
+
                   <div className="mb-3">
                     <textarea
                       className="form-control form-control-lg"
@@ -128,10 +134,11 @@ const PostPage = () => {
                       rows="3"
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                    ></textarea>
+                    />
                   </div>
+
                   <div className="row mb-3">
-                    <div className="col-md-6 mb-3 mb-md-0">
+                    <div className="col-md-6">
                       <select
                         className="form-select form-select-lg"
                         value={status}
@@ -144,6 +151,7 @@ const PostPage = () => {
                         <option value="In Review">In Review</option>
                       </select>
                     </div>
+
                     <div className="col-md-6">
                       <input
                         type="text"
@@ -168,6 +176,7 @@ const PostPage = () => {
                       onChange={(e) => setTitle(e.target.value)}
                     />
                   </div>
+
                   <div className="mb-3">
                     <textarea
                       className="form-control form-control-lg"
@@ -175,8 +184,9 @@ const PostPage = () => {
                       rows="4"
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                    ></textarea>
+                    />
                   </div>
+
                   <div className="mb-3">
                     <select
                       className="form-select form-select-lg"
@@ -192,18 +202,15 @@ const PostPage = () => {
                 </>
               )}
 
-              {/* Image Upload */}
               <div className="mb-4">
-                <label className="form-label fw-semibold">Attach Image(s)</label>
+                <label className="form-label fw-semibold">Attach Image</label>
                 <input
                   type="file"
                   className="form-control form-control-lg"
-                  multiple
                   onChange={handleImageChange}
                 />
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 className="btn submit-btn w-100 fw-bold"

@@ -1,34 +1,98 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../App.css";
+import supabase from "../config/supabse";
+import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const PostPage = () => {
-  const [category, setCategory] = useState(""); // Lost, Found, Complaint
+  const navigate = useNavigate();
+  const [category, setCategory] = useState(""); // Lost / Found / Complaint
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [status, setStatus] = useState("");
+  const [location, setLocation] = useState("");
+  const [severity, setSeverity] = useState("");
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleCategoryChange = (e) => {
-    setCategory(e.target.value);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (data?.user) setUser(data.user);
+    };
+    fetchUser();
+  }, []);
+
+  const handleCategoryChange = (e) => setCategory(e.target.value);
+  const handleImageChange = (e) => setImages([...e.target.files]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!user) return toast.error("You must be logged in!");
+    if (!category || !title || !description) {
+      return toast.error("Please fill all required fields!");
+    }
+
+    setLoading(true);
+    let imageUrls = [];
+
+    try {
+      // Upload images
+      for (let img of images) {
+        const fileName = `${Date.now()}_${img.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from("posts-images")
+          .upload(fileName, img);
+
+        if (uploadError) throw uploadError;
+
+        // Correctly get public URL
+        const { data: urlData } = supabase.storage
+          .from("posts-images")
+          .getPublicUrl(fileName);
+
+        imageUrls.push(urlData.publicUrl);
+      }
+
+      // Insert post into mypost table
+      const { error: insertError } = await supabase.from("mypost").insert([
+        {
+          user_id: user.id,
+          username: user.email,
+          category,
+          title,
+          description,
+          status: category !== "Complaint" ? status || null : null,
+          location: category !== "Complaint" ? location || null : null,
+          severity: category === "Complaint" ? severity || null : null,
+          images: imageUrls.length > 0 ? imageUrls : null,
+          created_at: new Date(),
+        },
+      ]);
+
+      if (insertError) throw insertError;
+
+      toast.success("Post created successfully!");
+      navigate("/home");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to create post. Please try again!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="container my-5 profile-page">
-      {/* Profile Header */}
-      <div className="d-flex align-items-center mb-5 p-3 user-header shadow-sm rounded">
-        <img
-          src="https://thumbs.dreamstime.com/b/city-park-pond-shore-alley-20238927.jpg"
-          alt="User"
-          className="user-img me-3"
-        />
-        <div>
-          <h4 className="user-name mb-1">Ayesha Khan</h4>
-          <p className="user-location text-muted mb-0">Karachi, Pakistan</p>
-        </div>
-      </div>
-
-      {/* Post Form Card */}
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="card post-form-card p-4 mb-5 shadow-sm">
         <h5 className="mb-4 fw-bold">Create New Post</h5>
 
-        <form>
+        <form onSubmit={handleSubmit}>
           {/* Category Dropdown */}
           <div className="mb-4">
             <select
@@ -46,7 +110,6 @@ const PostPage = () => {
           {/* Dynamic Fields */}
           {category && (
             <>
-              {/* Lost / Found Item Form */}
               {(category === "Lost" || category === "Found") && (
                 <>
                   <div className="mb-3">
@@ -54,6 +117,8 @@ const PostPage = () => {
                       type="text"
                       className="form-control form-control-lg"
                       placeholder="Item Title"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
                     />
                   </div>
                   <div className="mb-3">
@@ -61,11 +126,17 @@ const PostPage = () => {
                       className="form-control form-control-lg"
                       placeholder="Description"
                       rows="3"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
                     ></textarea>
                   </div>
                   <div className="row mb-3">
                     <div className="col-md-6 mb-3 mb-md-0">
-                      <select className="form-select form-select-lg">
+                      <select
+                        className="form-select form-select-lg"
+                        value={status}
+                        onChange={(e) => setStatus(e.target.value)}
+                      >
                         <option value="">Select Status</option>
                         <option value="Pending">Pending</option>
                         <option value="Found">Found</option>
@@ -78,17 +149,14 @@ const PostPage = () => {
                         type="text"
                         className="form-control form-control-lg"
                         placeholder="Location"
+                        value={location}
+                        onChange={(e) => setLocation(e.target.value)}
                       />
                     </div>
-                  </div>
-                  <div className="mb-4">
-                    <label className="form-label fw-semibold">Attach Image</label>
-                    <input type="file" className="form-control form-control-lg" />
                   </div>
                 </>
               )}
 
-              {/* Complaint Form */}
               {category === "Complaint" && (
                 <>
                   <div className="mb-3">
@@ -96,6 +164,8 @@ const PostPage = () => {
                       type="text"
                       className="form-control form-control-lg"
                       placeholder="Complaint Title"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
                     />
                   </div>
                   <div className="mb-3">
@@ -103,68 +173,47 @@ const PostPage = () => {
                       className="form-control form-control-lg"
                       placeholder="Describe your issue"
                       rows="4"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
                     ></textarea>
                   </div>
                   <div className="mb-3">
-                    <select className="form-select form-select-lg">
+                    <select
+                      className="form-select form-select-lg"
+                      value={severity}
+                      onChange={(e) => setSeverity(e.target.value)}
+                    >
                       <option value="">Select Severity</option>
                       <option value="Low">Low</option>
                       <option value="Medium">Medium</option>
                       <option value="High">High</option>
                     </select>
                   </div>
-                  <div className="mb-4">
-                    <label className="form-label fw-semibold">Attach Image</label>
-                    <input type="file" className="form-control form-control-lg" />
-                  </div>
                 </>
               )}
+
+              {/* Image Upload */}
+              <div className="mb-4">
+                <label className="form-label fw-semibold">Attach Image(s)</label>
+                <input
+                  type="file"
+                  className="form-control form-control-lg"
+                  multiple
+                  onChange={handleImageChange}
+                />
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                className="btn submit-btn w-100 fw-bold"
+                disabled={loading}
+              >
+                {loading ? "Posting..." : "Submit"}
+              </button>
             </>
           )}
-
-          {/* Submit Button */}
-          {category && (
-            <button type="submit" className="btn submit-btn w-100 fw-bold">
-              Submit
-            </button>
-          )}
         </form>
-      </div>
-
-      {/* User Posts Feed */}
-      <div className="row">
-        {[1, 2].map((i) => (
-          <div key={i} className="col-md-6 mb-4">
-            <div className="card post-card shadow-sm">
-              <img
-                src="https://thumbs.dreamstime.com/b/city-park-pond-shore-alley-20238927.jpg"
-                alt="Post"
-                className="card-img-top"
-                style={{
-                  borderRadius: "10px 10px 0 0",
-                  height: "150px",
-                  objectFit: "cover",
-                }}
-              />
-              <div className="card-body">
-                <div className="d-flex justify-content-between align-items-center mb-2">
-                  <h5 className="post-title">Post Title Example</h5>
-                  <span className="badge bg-warning text-dark">Pending</span>
-                </div>
-                <h6 className="card-subtitle mb-2 text-muted">
-                  Lost • Karachi
-                </h6>
-                <p className="card-text">
-                  Description of the post goes here. Example text for UI.
-                </p>
-                <div className="d-flex justify-content-end">
-                  <button className="btn btn-sm edit-btn me-2">Edit</button>
-                  <button className="btn btn-sm delete-btn">Delete</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   );

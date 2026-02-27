@@ -339,3 +339,10 @@
 .notification .text small {
   color: #999;
 }
+/* main page image */
+.logo-img {
+  width: 120px;       
+  height: auto;      
+  object-fit: contain; 
+  margin-bottom: 10px;
+}
